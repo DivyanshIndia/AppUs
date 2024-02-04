@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,42 +7,93 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import apiUrls from "../../api/apiUrls";
+import useApiPost from "../../hooks/useApiPost";
+import getToken from "../../utils/getToken";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
-const FriendProfile = ({ userData }) => {
+const FriendProfile = ({ userData, posts }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const { postData } = useApiPost();
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
-  const handleFollow = () => {
-    setIsFollowing(!isFollowing);
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      const id = await getToken("userId");
+      if (id) {
+        const isFollowingUser = userData?.followers?.find(
+          (followerId) => followerId === id
+        );
+        setIsFollowing(!!isFollowingUser); // Convert to boolean
+        console.log("isFollowing: ", isFollowing);
+      }
+    };
+
+    fetchFollowing();
+  }, [userData]);
+
+  const handleFollow = async () => {
+    setIsFollowing((prev) => !prev);
+    if (isFollowing) {
+      await postData(apiUrls.unfollowUser(userData._id));
+    } else {
+      await postData(apiUrls.followUser(userData._id));
+    }
+  };
+
+  const handlePush = (path, id) => {
+    router.push({ pathname: `/${path}/${id}` });
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: userData.profilePicture }}
+          source={{
+            uri:
+              `data:image/jpeg;base64,${userData?.profilePicture}` ||
+              "https://via.placeholder.com/150/000000/FFFFFF",
+          }}
           style={styles.profileImage}
         />
         <View style={styles.statsContainer}>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{userData.posts}</Text>
-            <Text style={styles.statLabel}>Posts</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{userData.followers}</Text>
-            <Text style={styles.statLabel}>Followers</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>{userData.following}</Text>
-            <Text style={styles.statLabel}>Following</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => handlePush("posts", userData._id)}
+          >
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>{posts || 0}</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePush("followers", userData._id)}
+          >
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>
+                {userData?.followers?.length || 0}
+              </Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePush("following", userData._id)}
+          >
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>
+                {userData?.following?.length || 0}
+              </Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.userInfo}>
-        <Text style={styles.fullName}>{userData.fullName}</Text>
-        <Text style={styles.username}>@{userData.username}</Text>
-        <Text style={styles.biography}>{userData.biography}</Text>
-        <Text style={styles.location}>{userData.location}</Text>
+        <Text style={styles.fullName}>{userData?.fullName || "name"}</Text>
+        <Text style={styles.username}>@{userData?.username || "username"}</Text>
+        <Text style={styles.biography}>{userData?.biography || "bio"}</Text>
+        <Text style={styles.location}>{userData?.location || "location"}</Text>
       </View>
 
       <TouchableOpacity style={styles.followButton} onPress={handleFollow}>

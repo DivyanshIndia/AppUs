@@ -1,9 +1,21 @@
-import NewsFeed from "../components/posts/NewsFeed";
-import dummyPosts from "../components/posts/dummyPosts";
+import { Redirect } from "expo-router";
+import getToken from "../utils/getToken";
+import { useEffect } from "react";
+
 const index = () => {
+  const fetchToken = async () => {
+    const token = await getToken("userID");
+    if (token) {
+      <Redirect href="/home" />;
+    }
+  };
+  useEffect(() => {
+    fetchToken();
+  }, []);
+
   return (
     <>
-      <NewsFeed posts={dummyPosts} />
+      <Redirect href="/logIn" />
     </>
   );
 };

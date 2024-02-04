@@ -1,36 +1,40 @@
-import React, { useState } from "react";
+// Signup.js
+
+import React, { useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import { useForm, Controller } from "react-hook-form";
 import styles from "./signup.style";
+import useApiPost from "../../hooks/useApiPost";
+import apiUrls from "../../api/apiUrls";
 
 const Signup = () => {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const password = watch("password");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const { response, error, loading, postData } = useApiPost();
 
-  const validateForm = () => {
-    if (!name || !email || !password || !confirmPassword) {
-      alert("Please fill in all fields.");
-      return false;
+  useEffect(() => {
+    if (response) {
+      console.log("Registration Success:", response);
+      router.push("/logIn");
     }
-
-    if (password !== confirmPassword) {
-      alert("Password and Confirm Password must match.");
-      return false;
+    if (error) {
+      console.error("Registration Failed:", error);
     }
+  }, [response, error]);
 
-    return true;
-  };
-
-  const handleSignUp = () => {
-    if (validateForm()) {
-      // TODO: Implement your sign-up logic
-      console.log("Sign Up pressed");
-    }
+  const onSubmit = async (data) => {
+    const { username, email, password, fullName } = data;
+    const formData = { username, email, password, fullName };
+    await postData(apiUrls.register, formData);
   };
 
   const handleTogglePassword = () => {
@@ -48,52 +52,139 @@ const Signup = () => {
         source={require("../../assets/images/logo.png")}
       />
       <Text style={styles.formTitle}>Sign Up</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Full Name"
-        placeholderTextColor="#000"
-        autoCapitalize="words"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#000"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Password"
-          placeholderTextColor="#000"
-          autoCapitalize="none"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity style={styles.eyeIcon} onPress={handleTogglePassword}>
-          <FontAwesome
-            name={showPassword ? "eye" : "eye-slash"}
-            size={20}
-            color="#000"
+
+      {/* Username Field */}
+      <Controller
+        control={control}
+        rules={{ required: "Username is required" }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Username"
+            placeholderTextColor="#000"
           />
-        </TouchableOpacity>
-      </View>
-      <TextInput
-        style={styles.ConfirmPasswordInput}
-        placeholder="Confirm Password"
-        placeholderTextColor="#000"
-        autoCapitalize="none"
-        secureTextEntry={!showPassword}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        )}
+        name="username"
       />
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+      {errors.username && (
+        <Text style={styles.errorText}>{errors.username.message}</Text>
+      )}
+
+      {/* Full Name Field */}
+      <Controller
+        control={control}
+        rules={{ required: "Full Name is required" }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Full Name"
+            placeholderTextColor="#000"
+          />
+        )}
+        name="fullName"
+      />
+      {errors.fullName && (
+        <Text style={styles.errorText}>{errors.fullName.message}</Text>
+      )}
+
+      {/* Email Field */}
+      <Controller
+        control={control}
+        rules={{
+          required: "Email is required",
+          pattern: {
+            value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+            message: "Invalid email address",
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Email"
+            placeholderTextColor="#000"
+          />
+        )}
+        name="email"
+      />
+      {errors.email && (
+        <Text style={styles.errorText}>{errors.email.message}</Text>
+      )}
+
+      {/* Password Field */}
+      <Controller
+        control={control}
+        rules={{
+          required: "Password is required",
+          minLength: {
+            value: 8,
+            message: "Password must be at least 8 characters long",
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              placeholder="Password"
+              placeholderTextColor="#000"
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={handleTogglePassword}
+            >
+              <FontAwesome
+                name={showPassword ? "eye" : "eye-slash"}
+                size={20}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+        name="password"
+      />
+      {errors.password && (
+        <Text style={styles.errorText}>{errors.password.message}</Text>
+      )}
+      {/* Confirm Password Field */}
+      <Controller
+        control={control}
+        rules={{
+          validate: (value) =>
+            value === password || "The passwords do not match",
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input} // Ensure this style is correct for your confirm password input
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Confirm Password"
+            placeholderTextColor="#000"
+            secureTextEntry={!showPassword}
+          />
+        )}
+        name="confirmPassword"
+      />
+      {errors.confirmPassword && (
+        <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>

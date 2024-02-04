@@ -1,10 +1,10 @@
 import React from "react";
-import AddPost from "../../../components/addPost/AddPost";
+import SignUp from "../../../components/signup/SignUp";
 
 const index = () => {
   return (
     <>
-      <AddPost />
+      <SignUp />
     </>
   );
 };

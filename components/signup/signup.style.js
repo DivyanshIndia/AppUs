@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
   ConfirmPasswordInput: {
     height: 40,
     width: "80%",
-    borderColor: "#000", 
+    borderColor: "#000",
     borderBottomWidth: 1,
-    color: "#000", 
+    color: "#000",
   },
   eyeIcon: {
     position: "absolute",
@@ -62,6 +62,11 @@ const styles = StyleSheet.create({
     color: "#fff", // Inverted to white text
     fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 10,
   },
 });
 

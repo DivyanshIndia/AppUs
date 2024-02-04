@@ -1,18 +1,47 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import styles from "./login.style";
+import apiUrls from "../../api/apiUrls";
+import useApiPost from "../../hooks/useApiPost";
+import saveToken from "../../utils/saveToken";
 
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const { postData, response, error: apiError } = useApiPost();
 
-  const handleLogin = () => {
-    // TODO: Implement your login logic
-    console.log("Login pressed");
+  useEffect(() => {
+    if (response && response.token) {
+      console.log(response);
+      saveToken("authToken", response.token);
+      const userId = response.user.id;
+      saveToken("userId", userId);
+      router.push("/home");
+    } else if (apiError) {
+      setError("Login failed. Please check your credentials.");
+    }
+  }, [response, apiError]);
+
+  const handleLogin = async () => {
+    setError("");
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
+    await postData(apiUrls.login, { email, password });
   };
 
   const handleTogglePassword = () => {
@@ -24,17 +53,14 @@ const Login = () => {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implement Forgot Password functionality
     console.log("Forgot Password pressed");
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={require("../../assets/images/logo.png")}
-      />
+      <Image style={styles.logo} source={require("../../assets/logo.png")} />
       <Text style={styles.formTitle}>Login</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -61,6 +87,9 @@ const Login = () => {
           />
         </TouchableOpacity>
       </View>
+
+      {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>

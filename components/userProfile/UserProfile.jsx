@@ -1,36 +1,73 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons"; // For icons
 
-const Statistic = ({ label, value }) => (
-  <View style={styles.statisticContainer}>
+// Helper component for statistics
+const Statistic = ({ label, value, onPress }) => (
+  <TouchableOpacity style={styles.statisticContainer} onPress={onPress}>
     <Text style={styles.statisticValue}>{value}</Text>
     <Text style={styles.statisticLabel}>{label}</Text>
-  </View>
+  </TouchableOpacity>
 );
 
-const UserProfile = ({ userData }) => {
+// Main UserProfile component
+const UserProfile = ({ userData, posts }) => {
+  const router = useRouter();
+
+  const handleEditProfile = () => {
+    router.push("/editProfile");
+  };
+
+  // Function to handle press on a statistic
+  const handleStatisticPress = (statisticType) => {
+    router.push(`/${statisticType}`);
+  };
+
   return (
     <View style={styles.container}>
-      <Image source={{ uri: userData.profilePicture }} style={styles.profileImage} />
-      <Text style={styles.fullName}>{userData.fullName}</Text>
-      <Text style={styles.username}>@{userData.username}</Text>
+      <TouchableOpacity onPress={() => console.log("Profile Image Clicked")}>
+        <Image
+          source={{
+            uri:
+              `data:image/jpeg;base64,${userData?.profilePicture}` ||
+              "https://via.placeholder.com/150",
+          }}
+          style={styles.profileImage}
+        />
+      </TouchableOpacity>
+      <Text style={styles.fullName}>{userData?.fullName || "Name"}</Text>
+      <Text style={styles.username}>@{userData?.username || "username"}</Text>
 
       <View style={styles.statsRow}>
-        <Statistic label="Posts" value={userData.posts} />
-        <Statistic label="Followers" value={userData.followers} />
-        <Statistic label="Following" value={userData.following} />
+        <Statistic
+          label="Posts"
+          value={posts || 0}
+          onPress={() => handleStatisticPress(`posts/${userData._id}`)}
+        />
+        <Statistic
+          label="Followers"
+          value={userData?.followers?.length || 0}
+          onPress={() => handleStatisticPress(`followers/${userData._id}`)}
+        />
+        <Statistic
+          label="Following"
+          value={userData?.following?.length || 0}
+          onPress={() => handleStatisticPress(`following/${userData._id}`)}
+        />
       </View>
 
-      <View style={styles.statsRow}>
-        <Statistic label="Comments" value={userData.comments} />
-        <Statistic label="Upvotes" value={userData.upvotes} />
-        <Statistic label="Downvotes" value={userData.downvotes} />
+      <View style={styles.bioSection}>
+        <Text style={styles.bio}>
+          {userData?.biography || "Your bio goes here..."}
+        </Text>
+      </View>
+      <View style={styles.locationSection}>
+        <MaterialIcons name="location-on" size={20} color="grey" />
+        <Text style={styles.location}>{userData?.location || "Location"}</Text>
       </View>
 
-      <Text style={styles.bio}>{userData.bio}</Text>
-      <Text style={styles.location}>{userData.location}</Text>
-
-      <TouchableOpacity style={styles.editButton}>
+      <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
         <Text style={styles.editButtonText}>Edit Profile</Text>
       </TouchableOpacity>
     </View>
@@ -40,63 +77,74 @@ const UserProfile = ({ userData }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: 'white',
+    alignItems: "center",
+    backgroundColor: "white",
     padding: 20,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginVertical: 10,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginVertical: 15,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
   fullName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "black",
   },
   username: {
-    fontSize: 16,
-    color: 'grey',
-    marginBottom: 10,
+    fontSize: 18,
+    color: "grey",
+    marginBottom: 12,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
-    marginVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
+    marginVertical: 15,
   },
   statisticContainer: {
-    alignItems: 'center',
+    alignItems: "center",
+    padding: 10,
   },
   statisticValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black",
   },
   statisticLabel: {
-    fontSize: 14,
-    color: 'grey',
+    fontSize: 16,
+    color: "grey",
   },
-  bio: {
-    fontSize: 14,
-    color: 'black',
-    textAlign: 'center',
+  bioSection: {
     marginVertical: 10,
   },
+  bio: {
+    fontSize: 16,
+    color: "black",
+    textAlign: "center",
+  },
+  locationSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
   location: {
-    fontSize: 14,
-    color: 'grey',
-    marginBottom: 10,
+    fontSize: 16,
+    color: "grey",
+    marginLeft: 5,
   },
   editButton: {
-    backgroundColor: 'black',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "black",
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 10,
   },
   editButtonText: {
-    color: 'white',
-    fontSize: 16,
+    color: "white",
+    fontSize: 18,
   },
 });
 

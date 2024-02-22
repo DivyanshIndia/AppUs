@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import SearchComponent from "../../components/findUsers/SearchComponent";
+import SearchComponent from "../../screens/findUsers/SearchComponent";
 
 export class search extends Component {
   render() {

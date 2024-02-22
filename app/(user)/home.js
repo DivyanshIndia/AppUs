@@ -1,11 +1,19 @@
-import React, { useEffect } from "react";
-import { View, ScrollView, Text, Image, StyleSheet } from "react-native"; // Import Text and Image
-import Post from "../../components/postsScreen/PostsScreen";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+} from "react-native"; // Import Text and Image
+import Post from "../../screens/postsScreen/PostsScreen";
 import useApiGet from "../../hooks/useApiGet";
 import apiUrls from "../../api/apiUrls";
 
 const Index = () => {
   const { data, loading, error, getData } = useApiGet();
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     getData(apiUrls.getAllPosts);
@@ -13,13 +21,22 @@ const Index = () => {
   }, []);
 
   return !loading ? (
-    <ScrollView>
-      {data?.map((post, index) => (
-        <View key={index}>
-          <Post data={post} authorDetails={post.author} />
+    <FlatList
+      data={data}
+      keyExtractor={(item, index) => index.toString()}
+      
+      renderItem={({ item }) => (
+        <View>
+          <Post data={item} authorDetails={item.author} />
         </View>
-      ))}
-    </ScrollView>
+      )}
+      refreshing={refresh}
+      onRefresh={() => {
+        setRefresh((prev) => !prev);
+        getData(apiUrls.getAllPosts);
+        setRefresh(false);
+      }}
+    />
   ) : (
     <View style={styles.loadingContainer}>
       <View style={styles.placeholderContainer}>

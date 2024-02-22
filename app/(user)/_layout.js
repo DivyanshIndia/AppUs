@@ -65,7 +65,9 @@ export default () => {
         name="settings"
         options={{
           headerShown: false,
-          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="cog" size={size} color={color} /> // Add the settings icon
+          ),
         }}
       />
 

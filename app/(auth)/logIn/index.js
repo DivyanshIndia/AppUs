@@ -1,5 +1,5 @@
 import React from "react";
-import Login from "../../../components/login/Login";
+import Login from "../../../screens/login/Login";
 
 const index = () => {
   return (

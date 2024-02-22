@@ -21,8 +21,12 @@ const layout = () => {
           ),
           headerRight: () => (
             <View style={styles.sideHeaderContainer}>
-              <TouchableOpacity onPress={() => router.push("/settings")}>
-                <Icon name="settings-outline" size={24} color="black" />
+              <TouchableOpacity onPress={() => router.push("/chats")}>
+                <Icon
+                  name="chatbubble-ellipses-outline"
+                  size={24}
+                  color="#333"
+                />
               </TouchableOpacity>
             </View>
           ),
@@ -52,6 +56,12 @@ const layout = () => {
           ),
           headerStyle: styles.header,
           headerBackVisible: true, // Shows the back button
+        }}
+      />
+      <Stack.Screen
+        name="(chat)"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

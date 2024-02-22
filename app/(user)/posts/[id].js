@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import apiUrls from "../../../api/apiUrls";
 import useApiGet from "../../../hooks/useApiGet";
-import Post from "../../../components/postsScreen/PostsScreen";
+import Post from "../../../screens/postsScreen/PostsScreen";
 
 const index = () => {
   const { id } = useLocalSearchParams();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import FriendProfile from "../../../components/friendProfile/FriendProfile";
+import FriendProfile from "../../../screens/friendProfile/FriendProfile";
 import { useLocalSearchParams } from "expo-router";
 import apiUrls from "../../../api/apiUrls";
 import useApiGet from "../../../hooks/useApiGet";
@@ -8,6 +8,7 @@ import { View, StyleSheet, ActivityIndicator } from "react-native";
 const PublicProfile = () => {
   const { id } = useLocalSearchParams();
   const { data: userData, error, getData, loading } = useApiGet();
+  const [change, setChange] = useState(false);
   const {
     data: postCount,
     error: postCountError,
@@ -29,7 +30,7 @@ const PublicProfile = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, change]);
 
   if (loading || postCountLoading) {
     return (
@@ -40,7 +41,7 @@ const PublicProfile = () => {
   }
 
   return (
-    <FriendProfile userData={userData || []} posts={postCount?.postCount} />
+    <FriendProfile userData={userData || []} posts={postCount?.postCount} setChange={setChange} />
   );
 };
 

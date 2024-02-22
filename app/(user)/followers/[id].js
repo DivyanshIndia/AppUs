@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
-import FollowersScreen from "../../../components/followersScreen/FollowersScreen";
+import React, { useEffect } from "react";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import FollowersScreen from "../../../screens/followersScreen/FollowersScreen";
 import apiUrls from "../../../api/apiUrls";
 import useApiGet from "../../../hooks/useApiGet";
 import { useLocalSearchParams } from "expo-router";

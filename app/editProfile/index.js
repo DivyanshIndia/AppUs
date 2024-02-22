@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import EditProfileScreen from "../../components/editProfile/EditProfile";
+import EditProfileScreen from "../../screens/editProfile/EditProfile";
 import apiUrls from "../../api/apiUrls";
 import useApiGet from "../../hooks/useApiGet";
 import getToken from "../../utils/getToken";

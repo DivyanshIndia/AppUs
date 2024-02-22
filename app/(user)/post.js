@@ -1,5 +1,5 @@
 import React from "react";
-import AddPost from "../../components/addPost/AddPost";
+import AddPost from "../../screens/addPost/AddPost";
 const index = () => {
   return (
     <>

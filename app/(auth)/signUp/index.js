@@ -1,5 +1,5 @@
 import React from "react";
-import SignUp from "../../../components/signup/SignUp";
+import SignUp from "../../../screens/signup/SignUp";
 
 const index = () => {
   return (

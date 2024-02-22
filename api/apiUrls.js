@@ -4,7 +4,7 @@
  * This includes routes for authentication, users, posts, and comments.
  */
 
-export const apiBaseUrl = "https://ca02-2409-40d2-69-5dc1-4894-d753-fc82-4aa8.ngrok-free.app"; // Base URL for  API
+export const apiBaseUrl = process.env.EXPO_PUBLIC_API_URL; // Base URL for  API
 
 const apiUrls = {
   // Authentication Routes
